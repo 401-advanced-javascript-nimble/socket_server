@@ -13,7 +13,6 @@ socket.on('turn', (payload) => {
 
   prompt.start();
 
-
   prompt.get(['stack', 'amount'], (err, data) => {
     if(err) {
       throw new Error(err);
@@ -22,7 +21,11 @@ socket.on('turn', (payload) => {
     let amount = data.amount;
 
     socket.emit('move', [stack, amount]);
-
     // gameCycle(stackNumber, numberToTake);
   });
+});
+
+socket.on('game over', (payload) => {
+  console.log('Game Over!');
+  socket.close();
 });

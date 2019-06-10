@@ -39,26 +39,15 @@ io.on('connect', (socket) => {
   }
 
   socket.on(events.move, payload => {
-    console.log(payload);
-
     let playerWhoMoved = players.indexOf(socket.id);
+    
     if(playerWhoMoved === 0) {
       gameCycle(payload[0], payload[1]);
-      
-      if(totalItemsRemaining === 0) {
-        io.to(`${players[1]}`).emit(events.turn, 'Game Over!');
-      } else {
-        io.to(`${players[1]}`).emit(events.turn, stacks);
-      }
+      io.to(`${players[1]}`).emit(events.turn, stacks);
     }
-    if(playerWhoMoved === 1) {
+    else if(playerWhoMoved === 1) {
       gameCycle(payload[0], payload[1]);
-
-      if(totalItemsRemaining === 0) {
-        io.to(`${players[0]}`).emit(events.turn, 'Game Over!');
-      } else {
-        io.to(`${players[0]}`).emit(events.turn, stacks);
-      }
+      io.to(`${players[0]}`).emit(events.turn, stacks);
     }
   });
 });
@@ -67,6 +56,13 @@ io.on('connect', (socket) => {
 //===========================================
 //Server Side Game Logic
 //===========================================
+
+function checkAndHandleGameOver() {
+  if(totalItemsRemaining === 0) {
+    io.to(`${players[0]}`).emit(events.gameOver, 'Game Over!');
+    io.to(`${players[1]}`).emit(events.gameOver, 'Game Over!');
+  }
+}
 
 // Chris - Here is the gameplay loop. This continues until totalRemainingItems is 0, which changes isGameOver to true.
 const gameCycle = (stackChoice, numberToTake) => {
@@ -78,6 +74,8 @@ const gameCycle = (stackChoice, numberToTake) => {
   }
   else {
     console.log('GAME OVER!!!!!!!');
+    io.to(`${players[0]}`).emit(events.gameOver, 'Game Over!');
+    io.to(`${players[1]}`).emit(events.gameOver, 'Game Over!');
   }
 };
 
