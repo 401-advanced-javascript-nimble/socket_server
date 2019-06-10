@@ -1,7 +1,6 @@
 'use strict';
 
 require('dotenv').config();
-const prompt = require('prompt');
 
 const events = require('./events.js');
 
@@ -26,7 +25,7 @@ const stacks = {
 const players = [];
 
 //===========================================
-//Socket
+//Sockets
 //===========================================
 
 io.on('connect', (socket) => {
@@ -58,9 +57,9 @@ io.on('connect', (socket) => {
 
 //Morgana - refactored to handle new stack structure and gameover emits
 const gameCycle = (stackChoice, numberToTake) => {
-  if(checkChoices(stackChoice, numberToTake) === true) {
+  // if(checkChoices(stackChoice, numberToTake) === true) {
     takeItemsFromStack(stackChoice, numberToTake);
-  }
+  // }
   if(totalItemsRemaining !== 0) {
     console.log({totalItemsRemaining});
   }
@@ -91,29 +90,6 @@ const _tallyTotalItemsRemaining = () => {
 const takeItemsFromStack = (stackChoice, numberToTake) => {
   stacks[stackChoice] = stacks[stackChoice] - numberToTake;
   _tallyTotalItemsRemaining();
-};
-
-// Chris - checks and validates the players' inputs.
-// Morgana - Changed to reflect new stack structure
-const checkChoices = (stackChoice, numberToTake) => {
-  // checks and validation for stackChoice
-  stackChoice.toLowerCase();
-  if(!Object.keys(stacks).includes(stackChoice)) {
-    console.log('Invalid stack choice');
-    return false;
-  }
-  
-  // checks and validation for numberToTake
-  if(typeof numberToTake !== 'number') {
-    numberToTake = parseInt(numberToTake);
-  }
-  if(isNaN(numberToTake) || numberToTake < 1 || numberToTake > stacks[stackChoice]) {
-    console.log('Invalid amount');
-    return false;
-  }
-
-  // Chris - if all the above is good continue
-  return true;
 };
 
 
