@@ -1,0 +1,26 @@
+{
+  "name": "socket_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/401-advanced-javascript-nimble/socket_server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/401-advanced-javascript-nimble/socket_server/issues"
+  },
+  "homepage": "https://github.com/401-advanced-javascript-nimble/socket_server#readme",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "eslint": "^5.16.0",
+    "socket.io": "^2.2.0"
+  }
+}
