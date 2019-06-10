@@ -21,7 +21,6 @@ socket.on('turn', (payload) => {
     let amount = data.amount;
 
     socket.emit('move', [stack, amount]);
-    // gameCycle(stackNumber, numberToTake);
   });
 });
 

@@ -15,8 +15,7 @@ const io = require('socket.io')(process.env.PORT);
 // When this is zero, game is over.
 let totalItemsRemaining;
 
-// Chris - Here's a basic setup for stacks to use during the game.  Might not be best as an array, but it was the easiest for me to get started with.
-// Refactoring into a different data type shouldn't be too tough if needed.
+// Chris - Here's a basic setup for stacks to use during the game.
 //Morgana - switched it over to being an object and using dynamic amounts.
 const stacks = {
   a: generateRandomAmount(),
@@ -57,14 +56,7 @@ io.on('connect', (socket) => {
 //Server Side Game Logic
 //===========================================
 
-function checkAndHandleGameOver() {
-  if(totalItemsRemaining === 0) {
-    io.to(`${players[0]}`).emit(events.gameOver, 'Game Over!');
-    io.to(`${players[1]}`).emit(events.gameOver, 'Game Over!');
-  }
-}
-
-// Chris - Here is the gameplay loop. This continues until totalRemainingItems is 0, which changes isGameOver to true.
+//Morgana - refactored to handle new stack structure and gameover emits
 const gameCycle = (stackChoice, numberToTake) => {
   if(checkChoices(stackChoice, numberToTake) === true) {
     takeItemsFromStack(stackChoice, numberToTake);
@@ -85,7 +77,7 @@ function generateRandomAmount() {
 }
 
 // Chris - this function tallies a new total for totalItemsRemaining after a player makes a valid move.
-// would change if we go to something other than an array to store the stacks.
+// Morgana - adjusted for new stack structure
 const _tallyTotalItemsRemaining = () => {
   let total = 0;
   for(let i in stacks) {
@@ -95,8 +87,7 @@ const _tallyTotalItemsRemaining = () => {
 };
 
 // Chris - This applies the player's move to the stack they selected, and updates totalRemainingItems.
-// I'm subtracting 1 from the stackChoice to keep indexing simpler from a player's perpective (I doubt they'd choose to take from stack 0)
-// would change if we go to something other than an array to store the stacks.
+// Morgana - adjusted for new stack structure
 const takeItemsFromStack = (stackChoice, numberToTake) => {
   stacks[stackChoice] = stacks[stackChoice] - numberToTake;
   _tallyTotalItemsRemaining();
@@ -121,7 +112,7 @@ const checkChoices = (stackChoice, numberToTake) => {
     return false;
   }
 
-  // Chris - if all the above is good, return true to continue gameplay loop
+  // Chris - if all the above is good continue
   return true;
 };
 
