@@ -7,6 +7,18 @@ const events = require('./events.js');
 
 const io = require('socket.io')(process.env.PORT);
 
+// Chris - Global variable to control if the game is still ongoing or if it has ended.
+let isGameOver = false;
+
+// Chris - Here's a basic setup for stacks to use during the game.  Might not be best as an array, but it was the easiest for me to get started with.
+// Refactoring into a different data type shouldn't be too tough if needed.
+//Morgana - switched it over to dynamic ammounts
+const stacks = {};
+
+stacks.a = generateRandomAmount();
+stacks.b = generateRandomAmount();
+stacks.c = generateRandomAmount();
+
 const players = [];
 
 io.on('connect', (socket) => {
@@ -14,8 +26,7 @@ io.on('connect', (socket) => {
   players.push(socket.id);
 
   if(players.length === 2) {
-    // Chris - This gets the party started!!!
-    getInput();
+    io.to(`${players[0]}`).emit(events.turn, 'You Start');
   }
 
   socket.on(events.move, payload => {
@@ -23,40 +34,26 @@ io.on('connect', (socket) => {
 
     let playerWhoMoved = players.indexOf(socket.id);
     if(playerWhoMoved === 0) {
-      io.to(`${players[1]}`).emit(events.turn, 'Your Turn');
+      gameCycle(payload[0], payload[1]);
+      io.to(`${players[1]}`).emit(events.turn, stacks);
     }
     if(playerWhoMoved === 1) {
-      io.to(`${players[0]}`).emit(events.turn, 'Your turn');
+      io.to(`${players[0]}`).emit(events.turn, stacks);
+      gameCycle(payload[0], payload[1]);
     }
   });
 });
 
 
-
-
-// Chris - this controls the prompt, and calls the gameCycle with the inputs.
-const getInput = () => {
-  console.table(stacks);
-  prompt.start();
-  prompt.get(['stack', 'number'], (err, data) => {
-    if(err) {
-      throw new Error(err);
-    }
-    let stackNumber = data.stack;
-    let numberToTake = data.number;
-    gameCycle(stackNumber, numberToTake);
-  });
-};
-
 // Chris - Here is the gameplay loop. This continues until totalRemainingItems is 0, which changes isGameOver to true.
-const gameCycle = (stackNumber, numberToTake) => {
-  if(checkChoices(stackNumber, numberToTake) === true) {
-    takeItemsFromStack(stackNumber, numberToTake);
+const gameCycle = (stackChoice, numberToTake) => {
+  if(checkChoices(stackChoice, numberToTake) === true) {
+    takeItemsFromStack(stackChoice, numberToTake);
   }
   checkForGameOver();
   if(isGameOver === false) {
     console.log({totalItemsRemaining});
-    getInput();
+    // getInput();
   }
   else {
     console.log('GAME OVER!!!!!!!');
@@ -72,27 +69,6 @@ function generateRandomAmount() {
   return Math.floor(Math.random() * 20) + 5;
 }
 
-// Chris - Global variable to control if the game is still ongoing or if it has ended.
-let isGameOver = false;
-
-// Chris - Here's a basic setup for stacks to use during the game.  Might not be best as an array, but it was the easiest for me to get started with.
-// Refactoring into a different data type shouldn't be too tough if needed.
-//Morgana - switched it over to dynamic ammounts
-const stacks = [
-  {
-    name: 'A',
-    numberOfItems: generateRandomAmount(),
-  },
-  {
-    name: 'B',
-    numberOfItems: generateRandomAmount(),
-  },
-  {
-    name: 'C',
-    numberOfItems: generateRandomAmount(),
-  },
-];
-
 // Chris - a tally to keep track of how many items are left game-wide accross all stacks. 
 // When this is zero, game is over.
 let totalItemsRemaining;
@@ -100,9 +76,11 @@ let totalItemsRemaining;
 // Chris - this function tallies a new total for totalItemsRemaining after a player makes a valid move.
 // would change if we go to something other than an array to store the stacks.
 const _tallyTotalItemsRemaining = () => {
-  totalItemsRemaining = stacks.reduce((acc, cur) => {
-    return acc + cur.numberOfItems;
-  }, 0);
+  let total = 0;
+  for(let i in stacks) {
+    total += stacks[i];
+  }
+  return total;
 };
 
 // Chris - sets initial state for totalItemsRemaining.  
@@ -110,20 +88,18 @@ const _tallyTotalItemsRemaining = () => {
 _tallyTotalItemsRemaining();
 
 // Chris - This applies the player's move to the stack they selected, and updates totalRemainingItems.
-// I'm subtracting 1 from the stackNumber to keep indexing simpler from a player's perpective (I doubt they'd choose to take from stack 0)
+// I'm subtracting 1 from the stackChoice to keep indexing simpler from a player's perpective (I doubt they'd choose to take from stack 0)
 // would change if we go to something other than an array to store the stacks.
-const takeItemsFromStack = (stackNumber, numberToTake) => {
-  stacks[stackNumber - 1].numberOfItems = stacks[stackNumber - 1].numberOfItems - numberToTake;
+const takeItemsFromStack = (stackChoice, numberToTake) => {
+  stacks[stackChoice] = stacks[stackChoice] - numberToTake;
   _tallyTotalItemsRemaining();
 };
 
 // Chris - checks and validates the players' inputs.
-const checkChoices = (stackNumber, numberToTake) => {
-  // checks and validation for stackNumber
-  if(typeof stackNumber !== 'number') {
-    stackNumber = parseInt(stackNumber);
-  }
-  if(isNaN(stackNumber) || stackNumber > stacks.length) {
+const checkChoices = (stackChoice, numberToTake) => {
+  // checks and validation for stackChoice
+  stackChoice.toLowerCase();
+  if(!Object.keys(stacks).includes(stackChoice)) {
     console.log('Invalid stack choice');
     return false;
   }
@@ -132,7 +108,7 @@ const checkChoices = (stackNumber, numberToTake) => {
   if(typeof numberToTake !== 'number') {
     numberToTake = parseInt(numberToTake);
   }
-  if(isNaN(numberToTake) || numberToTake < 1 || numberToTake > stacks[stackNumber - 1].numberOfItems) {
+  if(isNaN(numberToTake) || numberToTake < 1 || numberToTake > stacks[stackChoice]) {
     console.log('Invalid numberToTake choice');
     return false;
   }
