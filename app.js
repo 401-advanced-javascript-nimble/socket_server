@@ -16,4 +16,4 @@ socket.on('moved', (payload) => {
     socket.emit('move', {move: data.move});
     console.log('You selected', data.move);
   });
-})
+});

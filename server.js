@@ -58,7 +58,7 @@ io.on('connect', (socket) => {
 //Morgana - refactored to handle new stack structure and gameover emits
 const gameCycle = (stackChoice, numberToTake) => {
   // if(checkChoices(stackChoice, numberToTake) === true) {
-    takeItemsFromStack(stackChoice, numberToTake);
+  takeItemsFromStack(stackChoice, numberToTake);
   // }
   if(totalItemsRemaining !== 0) {
     console.log({totalItemsRemaining});
@@ -82,7 +82,7 @@ const _tallyTotalItemsRemaining = () => {
   for(let i in stacks) {
     total += stacks[i];
   }
-   totalItemsRemaining = total;
+  totalItemsRemaining = total;
 };
 
 // Chris - This applies the player's move to the stack they selected, and updates totalRemainingItems.
