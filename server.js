@@ -39,6 +39,7 @@ io.on('connect', (socket) => {
   if(players.length === 2) {
     io.to(`${players[0]}`).emit(events.message, 'Starting Game');
     io.to(`${players[1]}`).emit(events.message, 'Starting Game');
+    io.to(`${players[1]}`).emit(events.message, 'Waiting for other player to move');
     io.to(`${players[0]}`).emit(events.turn, stacks);
   }
 
