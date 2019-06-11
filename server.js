@@ -37,6 +37,8 @@ io.on('connect', (socket) => {
   }
 
   if(players.length === 2) {
+    io.to(`${players[0]}`).emit(events.message, 'Starting Game');
+    io.to(`${players[1]}`).emit(events.message, 'Starting Game');
     io.to(`${players[0]}`).emit(events.turn, stacks);
   }
 
@@ -46,10 +48,13 @@ io.on('connect', (socket) => {
     if(playerWhoMoved === 0) {
       gameCycle(payload[0], payload[1]);
       io.to(`${players[1]}`).emit(events.turn, stacks);
+      io.to(`${players[0]}`).emit(events.message, 'Waiting for other player to move');
+      
     }
     else if(playerWhoMoved === 1) {
       gameCycle(payload[0], payload[1]);
       io.to(`${players[0]}`).emit(events.turn, stacks);
+      io.to(`${players[1]}`).emit(events.message, 'Waiting for other player to move');
     }
   });
 
