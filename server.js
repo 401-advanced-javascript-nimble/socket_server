@@ -16,13 +16,13 @@ let totalItemsRemaining;
 
 // Chris - Here's a basic setup for stacks to use during the game.
 //Morgana - switched it over to being an object and using dynamic amounts.
-const stacks = {
+let stacks = {
   a: generateRandomAmount(),
   b: generateRandomAmount(),
   c: generateRandomAmount(),
 };
 
-const players = [];
+let players = [];
 
 //===========================================
 //Sockets
@@ -31,6 +31,10 @@ const players = [];
 io.on('connect', (socket) => {
   console.log(`Socket ${socket.id} connected`);
   players.push(socket.id);
+
+  if(players.length === 1) {
+    io.to(`${players[0]}`).emit(events.message, 'Waiting for second player...');
+  }
 
   if(players.length === 2) {
     io.to(`${players[0]}`).emit(events.turn, stacks);
@@ -47,6 +51,11 @@ io.on('connect', (socket) => {
       gameCycle(payload[0], payload[1]);
       io.to(`${players[0]}`).emit(events.turn, stacks);
     }
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`Socket ${socket.id} disconnected`);
+    players.splice(players.indexOf[socket.id], 1);
   });
 });
 
@@ -67,6 +76,12 @@ const gameCycle = (stackChoice, numberToTake) => {
     console.log('GAME OVER!!!!!!!');
     io.to(`${players[0]}`).emit(events.gameOver, 'Game Over!');
     io.to(`${players[1]}`).emit(events.gameOver, 'Game Over!');
+    players = [];
+    stacks = {
+      a: generateRandomAmount(),
+      b: generateRandomAmount(),
+      c: generateRandomAmount(),
+    };
   }
 };
 
