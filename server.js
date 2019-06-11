@@ -62,6 +62,10 @@ io.on('connect', (socket) => {
   socket.on('disconnect', () => {
     console.log(`Socket ${socket.id} disconnected`);
     players.splice(players.indexOf[socket.id], 1);
+    if(players.length === 1) {
+      io.to(`${players[0]}`).emit(events.message, 'Other player disconnected, ending game');
+      io.to(`${players[0]}`).emit(events.gameOver, 'Game Over!');
+    }
   });
 });
 
