@@ -44,28 +44,32 @@ io.on('connect', (socket) => {
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Starting Game');
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Waiting for other player to move');
     io.to(`${gameInstance.players[0]}`).emit(events.turn, [gameInstance.id, gameInstance.stacks]);
-
+    gameInstance.countdown = setInterval(gameInstance.decrement, 1000, gameInstance.players[0]);
+    console.log(gameInstance.countdown)
     //Morgana - empty the players array once a game is initialized
     players = [];
   }
 
   socket.on(events.move, payload => {
-
     const gameID = payload[0];
     const stackChoice = payload[1];
     const numberToTake = payload[2];
     const currentGame = games[gameID];
+    clearInterval(currentGame.countdown);
+    currentGame.timeLeft = 20;
     let playerWhoMoved = currentGame.players.indexOf(socket.id);
     
     if(playerWhoMoved === 0) {
       gameCycle(currentGame, stackChoice, numberToTake);
       io.to(`${currentGame.players[1]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
+      currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[1]);
       io.to(`${currentGame.players[0]}`).emit(events.message, 'Waiting for other player to move');
       
     }
     else if(playerWhoMoved === 1) {
       gameCycle(currentGame, stackChoice, numberToTake);
       io.to(`${currentGame.players[0]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
+      currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[1]);
       io.to(`${currentGame.players[1]}`).emit(events.message, 'Waiting for other player to move');
     }
   });
@@ -81,6 +85,8 @@ io.on('connect', (socket) => {
       io.to(`${gameToEnd.players[0]}`).emit(events.gameOver, 'Game Over!');
       io.to(`${gameToEnd.players[1]}`).emit(events.message, 'Player disconnected, ending game');
       io.to(`${gameToEnd.players[1]}`).emit(events.gameOver, 'Game Over!');
+      clearInterval(gameToEnd.countdown);
+      gameToEnd.timeLeft = 20;
     }
 
     if(players.includes(socket)) players.splice(players.indexOf(socket.id), 1);
@@ -104,6 +110,8 @@ const gameCycle = (currentGame, stackChoice, numberToTake) => {
     console.log('GAME OVER!!!!!!!');
     io.to(`${currentGame.players[0]}`).emit(events.gameOver, 'Game Over!');
     io.to(`${currentGame.players[1]}`).emit(events.gameOver, 'Game Over!');
+    clearInterval(currentGame.countdown);
+    currentGame.timeLeft = 20;
   }
 };
 

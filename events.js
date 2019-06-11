@@ -5,5 +5,6 @@ module.exports = {
   turn: 'turn',
   gameOver: 'game over',
   message: 'message-from-server',
+  countdown: 'countdown',
 };
 

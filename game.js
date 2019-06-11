@@ -10,9 +10,31 @@ class Game {
       b: this.generateRandomAmount(),
       c: this.generateRandomAmount(),
     };
+    this.players = [];
+    this.timeLeft = 20;
+    this.countdown;
     // Chris - a tally to keep track of how many items are left game-wide accross all stacks. 
     // When this is zero, game is over.
     this.totalItemsRemaining;
+    this.decrement = function(player) {
+      this.timeLeft--;
+      io.to(`${player}`).emit(events.message, this.timeLeft);
+      if (this.timeLeft === -1) {
+        console.log('Ran out of time!!');
+        io.emit(events.message, 'Time\'s up!!');
+        io.to(`${this.players[0]}`).emit(events.gameOver, 'Game Over!');
+        io.to(`${this.players[1]}`).emit(events.gameOver, 'Game Over!');
+        this.players = [];
+        this.stacks = {
+          a: this.generateRandomAmount(),
+          b: this.generateRandomAmount(),
+          c: this.generateRandomAmount(),
+        };
+        clearInterval(this.countdown);
+        this.countdown = null;
+        this.timeLeft = 20;
+      }
+    }
   }
 
   //Morgana - generates a random amount between 5 and 25
