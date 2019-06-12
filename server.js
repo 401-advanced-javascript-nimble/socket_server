@@ -58,13 +58,15 @@ io.on('connect', (socket) => {
     let playerWhoMoved = currentGame.players.indexOf(socket.id);
     
     if(playerWhoMoved === 0) {
-      gameCycle(currentGame, stackChoice, numberToTake, socket.id);
+      const otherPlayer = currentGame.players[1];
+      gameCycle(currentGame, stackChoice, numberToTake, otherPlayer);
       io.to(`${currentGame.players[1]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
       io.to(`${currentGame.players[0]}`).emit(events.message, 'Waiting for other player to move');
       
     }
     else if(playerWhoMoved === 1) {
-      gameCycle(currentGame, stackChoice, numberToTake, socket.id);
+      const otherPlayer = currentGame.players[0];
+      gameCycle(currentGame, stackChoice, numberToTake, otherPlayer);
       io.to(`${currentGame.players[0]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
       io.to(`${currentGame.players[1]}`).emit(events.message, 'Waiting for other player to move');
     }
