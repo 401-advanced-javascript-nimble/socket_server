@@ -44,7 +44,6 @@ io.on('connect', (socket) => {
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Starting Game');
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Waiting for other player to move');
     io.to(`${gameInstance.players[0]}`).emit(events.turn, [gameInstance.id, gameInstance.stacks]);
-    io.to(`${gameInstance.players[1]}`).emit(events.message, gameInstance.stacks);
     gameInstance.countdown = setInterval(gameInstance.decrement, 1000, gameInstance.players[0]);
     //Morgana - empty the players array once a game is initialized
     players = [];
