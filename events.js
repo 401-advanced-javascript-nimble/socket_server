@@ -6,5 +6,6 @@ module.exports = {
   gameOver: 'game over',
   message: 'message-from-server',
   countdown: 'countdown',
+  win: 'win',
 };
 

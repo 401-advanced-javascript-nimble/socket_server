@@ -60,14 +60,16 @@ io.on('connect', (socket) => {
     let playerWhoMoved = currentGame.players.indexOf(socket.id);
     
     if(playerWhoMoved === 0) {
-      gameCycle(currentGame, stackChoice, numberToTake);
+      const otherPlayer = currentGame.players[1];
+      gameCycle(currentGame, stackChoice, numberToTake, otherPlayer);
       io.to(`${currentGame.players[1]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
       currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[1]);
       io.to(`${currentGame.players[0]}`).emit(events.message, 'Waiting for other player to move');
       
     }
     else if(playerWhoMoved === 1) {
-      gameCycle(currentGame, stackChoice, numberToTake);
+      const otherPlayer = currentGame.players[0];
+      gameCycle(currentGame, stackChoice, numberToTake, otherPlayer);
       io.to(`${currentGame.players[0]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
       currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[0]);
       io.to(`${currentGame.players[1]}`).emit(events.message, 'Waiting for other player to move');
@@ -99,7 +101,7 @@ io.on('connect', (socket) => {
 //===========================================
 
 //Morgana - refactored to handle new stack structure and gameover emits
-const gameCycle = (currentGame, stackChoice, numberToTake) => {
+const gameCycle = (currentGame, stackChoice, numberToTake, socketID) => {
 
   currentGame.takeItemsFromStack(stackChoice, numberToTake);
 
@@ -108,6 +110,8 @@ const gameCycle = (currentGame, stackChoice, numberToTake) => {
   }
   else {
     console.log('GAME OVER!!!!!!!');
+    //Morgana - pass win back to client
+    io.to(`${socketID}`).emit(events.win);
     io.to(`${currentGame.players[0]}`).emit(events.gameOver, 'Game Over!');
     io.to(`${currentGame.players[1]}`).emit(events.gameOver, 'Game Over!');
     clearInterval(currentGame.countdown);
