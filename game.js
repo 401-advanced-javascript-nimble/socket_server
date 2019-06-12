@@ -4,8 +4,8 @@ const events = require('./events.js');
 
 class Game {
   constructor(id, io) {
-    this.io = io;
-    this.id = id;
+    this.io = io || null;
+    this.id = id || null;
     // Chris - Here's a basic setup for stacks to use during the game.
     //Morgana - switched it over to being an object and using dynamic amounts.
     this.stacks = {
@@ -15,10 +15,10 @@ class Game {
     };
     this.players = [];
     this.timeLeft = 20;
-    this.countdown;
+    this.countdown = null;
     // Chris - a tally to keep track of how many items are left game-wide accross all stacks. 
     // When this is zero, game is over.
-    this.totalItemsRemaining;
+    this.totalItemsRemaining = 0;
     this.decrement = this.decrement.bind(this);
   }
   
@@ -32,12 +32,6 @@ class Game {
       this.io.emit(events.message, 'Time\'s up!!');
       this.io.to(`${this.players[0]}`).emit(events.gameOver, 'Game Over!');
       this.io.to(`${this.players[1]}`).emit(events.gameOver, 'Game Over!');
-      this.players = [];
-      this.stacks = {
-        a: this.generateRandomAmount(),
-        b: this.generateRandomAmount(),
-        c: this.generateRandomAmount(),
-      };
       clearInterval(this.countdown);
       this.countdown = null;
       this.timeLeft = 20;
