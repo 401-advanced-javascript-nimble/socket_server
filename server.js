@@ -44,6 +44,7 @@ io.on('connect', (socket) => {
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Starting Game');
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Waiting for other player to move');
     io.to(`${gameInstance.players[0]}`).emit(events.turn, [gameInstance.id, gameInstance.stacks]);
+    io.to(`${gameInstance.players[1]}`).emit(events.message, gameInstance.stacks);
     gameInstance.countdown = setInterval(gameInstance.decrement, 1000, gameInstance.players[0]);
     //Morgana - empty the players array once a game is initialized
     players = [];
@@ -68,7 +69,7 @@ io.on('connect', (socket) => {
     else if(playerWhoMoved === 1) {
       gameCycle(currentGame, stackChoice, numberToTake);
       io.to(`${currentGame.players[0]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
-      currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[1]);
+      currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[0]);
       io.to(`${currentGame.players[1]}`).emit(events.message, 'Waiting for other player to move');
     }
   });
