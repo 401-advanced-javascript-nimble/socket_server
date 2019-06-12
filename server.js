@@ -31,7 +31,7 @@ io.on('connect', (socket) => {
 
   if(players.length === 2) {
     //Morgana - When there are two players, create a new game instance with an id
-    let gameInstance = new Game(Object.keys(games).length);
+    let gameInstance = new Game(Object.keys(games).length, io);
     //Morgana - Set the players, and save the game to the games object
     //Morgana - spread operator creates a shallow copy, avoiding reference issues
     gameInstance.players = [players[0].id, players[1].id];
@@ -45,7 +45,6 @@ io.on('connect', (socket) => {
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Waiting for other player to move');
     io.to(`${gameInstance.players[0]}`).emit(events.turn, [gameInstance.id, gameInstance.stacks]);
     gameInstance.countdown = setInterval(gameInstance.decrement, 1000, gameInstance.players[0]);
-    console.log(gameInstance.countdown)
     //Morgana - empty the players array once a game is initialized
     players = [];
   }
