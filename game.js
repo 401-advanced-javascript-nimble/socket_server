@@ -1,7 +1,10 @@
 'use strict';
+const events = require('./events.js');
+
 
 class Game {
-  constructor(id) {
+  constructor(id, io) {
+    this.io = io;
     this.id = id;
     // Chris - Here's a basic setup for stacks to use during the game.
     //Morgana - switched it over to being an object and using dynamic amounts.
@@ -10,11 +13,36 @@ class Game {
       b: this.generateRandomAmount(),
       c: this.generateRandomAmount(),
     };
+    this.players = [];
+    this.timeLeft = 20;
+    this.countdown;
     // Chris - a tally to keep track of how many items are left game-wide accross all stacks. 
     // When this is zero, game is over.
     this.totalItemsRemaining;
+    this.decrement = this.decrement.bind(this);
   }
-
+  
+  decrement(player) {
+    console.log(this);
+    this.timeLeft = this.timeLeft - 1;
+    console.log(this.timeLeft);
+    this.io.to(`${player}`).emit(events.countdown, this.timeLeft);
+    if (this.timeLeft === -1) {
+      console.log('Ran out of time!!');
+      this.io.emit(events.message, 'Time\'s up!!');
+      this.io.to(`${this.players[0]}`).emit(events.gameOver, 'Game Over!');
+      this.io.to(`${this.players[1]}`).emit(events.gameOver, 'Game Over!');
+      this.players = [];
+      this.stacks = {
+        a: this.generateRandomAmount(),
+        b: this.generateRandomAmount(),
+        c: this.generateRandomAmount(),
+      };
+      clearInterval(this.countdown);
+      this.countdown = null;
+      this.timeLeft = 20;
+    }
+  }
   //Morgana - generates a random amount between 5 and 25
   generateRandomAmount() {
     return Math.floor(Math.random() * 20) + 5;
