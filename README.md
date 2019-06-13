@@ -26,7 +26,7 @@
 * PORT -- port to use (when running locally)
 
 ### Running the App
-* Clone or download repo
+* Clone or download the repo at (https://github.com/401-advanced-javascript-nimble/socket_server)
 * Run `npm i`
 * Run `node server.js`
 
@@ -36,8 +36,38 @@
 * [Client Repo](https://github.com/401-advanced-javascript-nimble/client)
 
 #### Tests
-* **How do you run tests?** We refactored much of the code, wrapping functions in other functions in order to more easily test our own code.
-* **What assertions were made?** Only two players per game.
+* **How do you run tests?** `npm test`
+* **What assertions were made?**
+Server
+  Event Emitter
+    Wraps the emit event
+    Does not require a target
+  Game creation
+    When a single socket connects, it stores the socket and sends a wait message
+    When a second socket connects, it creates a game, sets the countdown, and clears the players array ingroom)
+  On move
+    Can correctly target the player/socket that 'moved'
+  Game Cycle
+    if the stacks are empty, the game ends 
+    targets the correct player for win/loss 
+  On Disconnect
+    if a player disconnects mid-game, it ends the game 
+
+Game Class
+  instantiating
+    can instantiate with an id and io 
+    instantiating without id and io results in undefineds 
+  starting properties
+    should have stacks 
+    can add players 
+    has a turn time limit 
+    has a property to store the total number of things in the stacks
+  Methods
+    can randomly generate amounts for the stacks 
+    can tally the total items in the stacks
+    can remove a given amount from a given stack 
+    can decrement the time left 
+    if time runs out, it ends the game
 
 #### UML
 ![UML](./assets/Nimble_UML.jpg)
