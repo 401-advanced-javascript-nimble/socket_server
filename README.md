@@ -20,25 +20,8 @@
 * `lib/disconnect_wrapper.js` -- Module that uses the curryIo function. It includes logic that emits the message event, 'Player disconnected, ending game', when either player ends the game AND logic that emits the gameOver event with message, 'Game Over!', when either player ends a game.
 * `lib/emit_wrapper.js` -- Module with logic for the emitWrapper function that takes in four parameters: **io** (the socket server instance), **event**, (the event to listen for), **payload** (usually data associated with an event), and **target** (the client id for a specific player). If a target exists, the emitted event is sent to that specific player. Otherwise the emitted event is sent to all listening parties.
 * `lib/game_cycle.js` -- Module that defines and exports the gameCycle function which takes in five parameters: **io** (the socket server instance), **currentGame** (the current game instance), **stackChoice** (the stack from which the current player chose to remove items), **numberToTake** (the amount the player chose to remove), and **socketID** (can represent either player). Includes logic that states the winner based on the number of remaining items. Emits events to the winner and loser regarding their game status.
-* 
+
 * `lib/move_wrapper.js` -- Module that uses the curryIo function. It includes logic for the moveWrapper function that takes in three parameters: **socket** (can represent either player), **games** (an object with a property containing current game id), and **payload** (an array of data containing the user's selections for their turn).
-
-
-
-
-* `src/commands/handle_leaderboard.js` -- Module with async function to render the leaderboard. Specifically, it requires **superagent** for AJAX requests to our server for user stats, **cli-table** to build the leaderboard table in the command line, and **figlet** to create ASCII Art from text.
-* `src/commands/handle_play.js` -- Module with async function to validate user token and start new game.
-* `src/commands/handle_signin.js` -- Module that requires **prompts** to create a more colorful CLI interface, **clear** to clear the terminal screen, and **figlet** to create ASCII Art from text. Specifically, it includes an async function that prompts user for username and password for **signin**.
-
-* `src/commands/handle_signout.js` -- Module with logic to sign user out.
-
-* `src/commands/handle_signup.js` -- Module that requires **prompts** to create a more colorful CLI interface, **clear** to clear the terminal screen, and **figlet** to create ASCII Art from text. Specifically, it includes an async function that prompts user for username and password for **signup**.
-
-* `src/lib/User.js` -- Module that requires **superagent** for AJAX requests to our server, and **configstore** as a means to store user data. A User class is defined with methods to create, hold, and delete a user authentication token. This is used to communicate the user's win/loss status of the current game to the API Server.
-
-* `src/lib/game.js` -- Module that requires **socket.io-client**, and **prompts**. A Game class is defined and includes logic for the **client socket** to react to events such as a message from the server, a new turn, turn countdown, clear line after timeout, game over, and game win. It also includes logic for **prompt functionality** such as 'Which stack?' and 'How much?', and **client-side game logic** to validate stack and amount provided by user.
-
-
 
 ### Setup
 #### `.env` Requirements
@@ -63,9 +46,8 @@ Requires: stats: {wins}
 * The RESTful API server runs live at https://nimble-api-server.herokuapp.com/. Perform the above requests to interact with the API. 
 
 #### Tests
-* How do you run tests?
-* What assertions were made?
-* What assertions need to be / should be made?
+* **How do you run tests?** We refactored much of the code, wrapping functions in other functions in order to more easily test our own code.
+* **What assertions were made?** Only two players per game.
 
 #### UML
 ![UML](./assets/Nimble_UML.jpg)
