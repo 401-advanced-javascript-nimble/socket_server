@@ -12,7 +12,7 @@ const events = require('./events.js');
 
 // const emitWrapper = require('./lib/emit_wrapper.js');
 
-let games = {};
+let gamesHolder = {};
 
 io.on('connect', connectionContainer);
 
@@ -20,7 +20,8 @@ io.on('connect', connectionContainer);
 function connectionContainer(socket) {
   console.log(`Socket ${socket.id} connected`);
 
-  games = connectionWrapper(socket);
+  const {games, players} = connectionWrapper(socket);
+  gamesHolder = games;
 
   socket.on(events.move, payload => {
     moveWrapper(socket, games, payload);

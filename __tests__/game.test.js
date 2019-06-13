@@ -2,19 +2,37 @@
 
 const Game = require('../game.js');
 
+class MockIo {
+  constructor() {
+    
+  }
+  to(target) {
+    this.target = target;
+    return this;
+  }
+  emit(event, payload) {
+    this.event = event;
+    this.payload = payload;
+    return this;
+  }
+}
+
+const testIo = new MockIo;
+
 describe( 'Game Class', () => {
 
   describe('instantiating', () => {
-    it('can instantiate with an id', () => {
-      const gameWithId = new Game(7);
+    it('can instantiate with an id and io', () => {
+      const gameWithId = new Game(7, testIo);
       expect(gameWithId.id).toBe(7);
-    });
-    
-    it('if no id passed in, id equals null', () => {
-      const emptyGame = new Game();
-      expect(emptyGame.id).toBeNull();
+      expect(gameWithId.io).toBeDefined;
     });
 
+    it('instantiating without id and io results in undefineds', () => {
+      const emptyGame = new Game();
+      expect(emptyGame.id).not.toBeDefined();
+      expect(emptyGame.io).not.toBeDefined();
+    });
   });
 
   describe('starting properties', () => {
@@ -48,14 +66,10 @@ describe( 'Game Class', () => {
       expect(testGame.totalItemsRemaining).toBeDefined();
       expect(typeof testGame.totalItemsRemaining).toBe('number');    
     });
-
-    it('has a property to store reference to the server socket', () => {
-      expect(testGame.io).toBeDefined();
-    });
   });
 
   describe('Methods', () => {
-    const testGame = new Game(12);
+    const testGame = new Game(12, testIo);
 
     it('can randomly generate amounts for the stacks', () => {
       expect(typeof testGame.generateRandomAmount()).toBe('number');
@@ -78,11 +92,17 @@ describe( 'Game Class', () => {
       expect(testGame.stacks.a).toEqual(startingValue - 4);
     });
 
-    // it('can decrement the time left', () => {
-    //   const startingTime = testGame.timeLeft;
-    //   testGame.players.push('mock player');
-    //   testGame.decrement('mock player');
-    //   expect(testGame.timeLeft).toEqual(startingTime - 1);
-    // });
+    it('can decrement the time left', () => {
+      const startingTime = testGame.timeLeft;
+      testGame.players.push('mock player');
+      testGame.decrement('mock player');
+      expect(testGame.timeLeft).toEqual(startingTime - 1);
+    });
+
+    it('if time runs out, it ends the game', () => {
+      testGame.timeLeft = 0;
+      testGame.decrement('mock player');
+      expect(testGame.io.payload).toBe('Game Over!');
+    });
   });
 });
