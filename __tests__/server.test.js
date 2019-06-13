@@ -87,6 +87,21 @@ describe('Game Cycle', () => {
     gameCycle(testIo, gameHolder[0], 'a', 1, mockSocket1.id);
     expect(testIo.payload).toBe('Game Over!');
   });
+  it('targets the correct player for win/loss', () => {
+    gameHolder[0].stacks['a'] = 1;
+    gameHolder[0].stacks['b'] = 0;
+    gameHolder[0].stacks['c'] = 0;
+    let results = gameCycle(testIo, gameHolder[0], 'a', 1, mockSocket1.id);
+    expect(results.winner).toBe('Alice');
+    expect(results.loser).toBe('Ted');
+
+    gameHolder[0].stacks['a'] = 1;
+    gameHolder[0].stacks['b'] = 0;
+    gameHolder[0].stacks['c'] = 0;
+    results = gameCycle(testIo, gameHolder[0], 'a', 1, mockSocket2.id);
+    expect(results.winner).toBe('Ted');
+    expect(results.loser).toBe('Alice');
+  });
 });
 
 describe('On Disconnect', () => {
