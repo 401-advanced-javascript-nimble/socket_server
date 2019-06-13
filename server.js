@@ -63,14 +63,13 @@ io.on('connect', (socket) => {
       gameCycle(currentGame, stackChoice, numberToTake, otherPlayer);
       io.to(`${currentGame.players[1]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
       currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[1]);
-      io.to(`${currentGame.players[0]}`).emit(events.message, 'Waiting for other player to move');
-      
+      io.to(`${currentGame.players[0]}`).emit(events.message, 'Waiting for other player to move');  
     }
     else if(playerWhoMoved === 1) {
       const otherPlayer = currentGame.players[0];
       gameCycle(currentGame, stackChoice, numberToTake, otherPlayer);
-      io.to(`${currentGame.players[0]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
       currentGame.countdown = setInterval(currentGame.decrement, 1000, currentGame.players[0]);
+      io.to(`${currentGame.players[0]}`).emit(events.turn, [currentGame.id, currentGame.stacks]);
       io.to(`${currentGame.players[1]}`).emit(events.message, 'Waiting for other player to move');
     }
   });

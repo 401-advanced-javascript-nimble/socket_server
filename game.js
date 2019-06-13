@@ -23,10 +23,7 @@ class Game {
   }
   
   decrement(player) {
-    console.log(this);
     this.timeLeft = this.timeLeft - 1;
-    console.log(this.timeLeft);
-    this.io.to(`${player}`).emit(events.countdown, this.timeLeft);
     if (this.timeLeft === -1) {
       console.log('Ran out of time!!');
       this.io.emit(events.message, 'Time\'s up!!');
