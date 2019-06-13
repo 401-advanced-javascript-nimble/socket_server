@@ -5,6 +5,8 @@ require('dotenv').config();
 const events = require('./events.js');
 const Game = require('./game.js');
 
+const emitWrapper = require('./lib/emit_wrapper.js');
+
 const io = require('socket.io')(process.env.PORT);
 
 //===========================================
@@ -12,21 +14,23 @@ const io = require('socket.io')(process.env.PORT);
 //===========================================
 
 let games = {};
-
 let players = [];
 
 //===========================================
-//Sockets
+//Socket Functionality
 //===========================================
 
-io.on('connect', (socket) => {
+io.on('connect', playerConnect);
+
+function playerConnect(socket) {
+  console.log(this);
   console.log(`Socket ${socket.id} connected`);
   socket.gameID = 'none yet';
   
   players.push(socket);
 
   if(players.length === 1) {
-    io.to(`${players[0].id}`).emit(events.message, 'Waiting for second player...');
+    emitWrapper(events.message, 'Waiting for second player...', io.to(`${players[0].id}`).emit.bind(this));
   }
 
   if(players.length === 2) {
@@ -41,6 +45,9 @@ io.on('connect', (socket) => {
 
     //Morgana - send the initial game-start messages
     io.to(`${gameInstance.players[0]}`).emit(events.message, 'Starting Game');
+
+
+
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Starting Game');
     io.to(`${gameInstance.players[1]}`).emit(events.message, 'Waiting for other player to move');
     io.to(`${gameInstance.players[0]}`).emit(events.turn, [gameInstance.id, gameInstance.stacks]);
@@ -92,7 +99,7 @@ io.on('connect', (socket) => {
 
     if(players.includes(socket)) players.splice(players.indexOf(socket.id), 1);
   });
-});
+}
 
 
 //===========================================
@@ -117,6 +124,3 @@ const gameCycle = (currentGame, stackChoice, numberToTake, socketID) => {
     currentGame.timeLeft = 20;
   }
 };
-
-
-
