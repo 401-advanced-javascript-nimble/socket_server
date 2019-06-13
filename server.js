@@ -24,11 +24,11 @@ function connectionContainer(socket) {
   gamesHolder = games;
 
   socket.on(events.move, payload => {
-    moveWrapper(socket, games, payload);
+    moveWrapper(socket, gamesHolder, payload);
   });
 
   socket.on('disconnect', () => {
-    disconnectWrapper(socket, games);
+    disconnectWrapper(socket, gamesHolder);
   });
 
 }
