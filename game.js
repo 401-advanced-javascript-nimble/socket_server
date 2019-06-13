@@ -21,8 +21,8 @@ class Game {
    * @param {*} io - Socket server instance
    */
   constructor(id, io) {
-    this.io = io || null;
-    this.id = id || null;
+    this.io = io;
+    this.id = id;
     // Chris - Here's a basic setup for stacks to use during the game.
     //Morgana - switched it over to being an object and using dynamic amounts.
     this.stacks = {
@@ -51,19 +51,12 @@ class Game {
     this.timeLeft = this.timeLeft - 1;
     console.log(this.timeLeft);
 
-    emitWrapper(events.countdown, this.timeLeft, this.io.to(`${player}`).emit);
-    // this.io.to(`${player}`).emit(events.countdown, this.timeLeft);
+    emitWrapper(this.io, events.countdown, this.timeLeft, `${player}`);
     if (this.timeLeft === -1) {
       console.log('Ran out of time!!');
-
-      emitWrapper(events.message, 'Time\'s up!!', this.io.emit);
-      // this.io.emit(events.message, 'Time\'s up!!');
-      
-      emitWrapper(events.gameOver, 'Game Over!', this.io.to(`${this.players[0]}`).emit);
-      // this.io.to(`${this.players[0]}`).emit(events.gameOver, 'Game Over!');
-
-      emitWrapper(events.gameOver, 'Game Over!', this.io.to(`${this.players[1]}`).emit);
-      // this.io.to(`${this.players[1]}`).emit(events.gameOver, 'Game Over!');
+      emitWrapper(this.io, events.message, 'Time\'s up!!');
+      emitWrapper(this.io, events.gameOver, 'Game Over!', `${this.players[0]}`);
+      emitWrapper(this.io, events.gameOver, 'Game Over!', `${this.players[1]}`);
       clearInterval(this.countdown);
       this.countdown = null;
       this.timeLeft = 20;
