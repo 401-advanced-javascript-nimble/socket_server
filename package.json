@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --verbose --coverage",
     "start": "node server.js"
   },
   "repository": {
@@ -21,6 +21,7 @@
   "dependencies": {
     "dotenv": "^8.0.0",
     "eslint": "^5.16.0",
+    "jest": "^24.8.0",
     "prompt": "^1.0.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0"
