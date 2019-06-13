@@ -20,8 +20,9 @@ io.on('connect', connectionContainer);
 function connectionContainer(socket) {
   console.log(`Socket ${socket.id} connected`);
 
-  games = connectionWrapper(socket);
-
+  const {gamesObj, players} = connectionWrapper(socket);
+  games = gamesObj;
+  
   socket.on(events.move, payload => {
     moveWrapper(socket, games, payload);
   });
