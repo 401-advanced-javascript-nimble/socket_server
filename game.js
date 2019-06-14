@@ -49,9 +49,6 @@ class Game {
    */
   decrement(player) {
     this.timeLeft = this.timeLeft - 1;
-    console.log(this.timeLeft);
-    emitWrapper(this.io, events.countdown, this.timeLeft, `${player}`);
-    
     if (this.timeLeft === -1) {
       console.log('Ran out of time!!');
       emitWrapper(this.io, events.message, 'Time\'s up!!');
